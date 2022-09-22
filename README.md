@@ -19,7 +19,7 @@ A simple Rest API service Using Golang, which exposes endpoints to List, Show an
 ## Steps to Run the App
 
 ```sh
-cd FruitSale
+cd Golang-REST-Service
 go run main.go  
 ```
 ## API Doc

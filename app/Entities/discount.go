@@ -21,6 +21,7 @@ func newProductTypes() *FruitTypes {
 		Apple:     "Apple",
 		Pineapple: "Pineapple",
 		Banana:    "Banana",
+		Others:    "Other",
 	}
 }
 
@@ -34,6 +35,7 @@ type FruitTypes struct {
 	Apple     string
 	Pineapple string
 	Banana    string
+	Others    string
 }
 
 type Discount struct {

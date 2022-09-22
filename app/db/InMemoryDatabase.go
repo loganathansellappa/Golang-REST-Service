@@ -8,8 +8,10 @@ package db
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"sort"
 	"sync"
+	"time"
 )
 
 import "FruitSale/app/Entities"
@@ -234,12 +236,15 @@ Seed
 	Seed dummy data foe the app
 */
 func (d *MemoryDatabase) Seed() {
-	for i := 1; i <= 30; i++ {
-		d.SeedProduct(AUTO_ID.ID()+1, Entities.ProductTypes.Apple, 1)
-		d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Banana, 2)
-		d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Pineapple, 5)
-	}
+	d.SeedProduct(AUTO_ID.ID()+1, Entities.ProductTypes.Apple, 1)
+	d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Banana, 2)
+	d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Pineapple, 5)
 	d.SeedDiscount()
+	for i := 1; i <= 30; i++ {
+		rand.Seed(time.Now().UnixNano())
+		price := float32(rand.Intn(30-1) + 1)
+		d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Others, price)
+	}
 
 }
 func (d *MemoryDatabase) SeedDiscount() {
@@ -264,13 +269,22 @@ func (d *MemoryDatabase) SeedDiscount() {
 	d.AddDiscount(discountTwo)
 }
 func (d *MemoryDatabase) SeedProduct(id int, name string, price float32) {
-	title := fmt.Sprintf(`%s - %d`, name, id)
 	prod := Entities.Product{
 		ID:          id,
 		Type:        name,
-		Title:       title,
+		Title:       fmt.Sprintf(`%s - %d`, name, id),
 		Description: name + "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed bibendum ante purus, id fermentum nulla commodo vehicula. Nulla id volutpat lorem, et vehicula enim. Nam erat nunc, efficitur eget nibh at, euismod molestie justo. Nunc dictum euismod lacus nec varius. Sed efficitur dui et magna elementum pharetra. Proin ipsum mauris, pretium id tellus at, ultrices maximus metus. Interdum et malesuada fames ac ante ipsum primis in faucibus. In arcu dui, volutpat in sem vehicula, hendrerit lacinia elit. Nullam tristique augue non tempor efficitur. Nulla iaculis nibh at tortor pharetra, sit amet ornare lectus auctor. Sed nec sapien at est fermentum posuere. Fusce suscipit tristique velit, et consectetur nunc dignissim nec. Sed id ligula ut ante gravida ornare. Suspendisse eu odio lacus. Proin rhoncus convallis vehicula.",
 		Price:       price,
+		ImageUrl:    "https://img.pixers.pics/pho_wat(s3:700/FO/78/15/78/42/700_FO78157842_1e837a4bfb4e3bdabed3afa8ae0e4361.jpg,700,465,cms:2018/10/5bd1b6b8d04b8_220x50-watermark.png,over,480,415,jpg)/seitenschlaferkissen-frische-fruchte-mixed-fruits-background-dieting-gesunde-ernahrung.jpg.jpg",
+	}
+	if name == Entities.ProductTypes.Apple {
+		prod.ImageUrl = "https://images.pexels.com/photos/672101/pexels-photo-672101.jpeg"
+	}
+	if name == Entities.ProductTypes.Pineapple {
+		prod.ImageUrl = "https://helios-i.mashable.com/imagery/articles/05W5DssM7oLPbBjiU4ZY6ob/hero-image.fill.size_1248x702.v1645798494.jpg"
+	}
+	if name == Entities.ProductTypes.Banana {
+		prod.ImageUrl = "https://avectime.com/grocery&gourmet/agriculture/brands/images/gros_michel_banana/gros_michel_banana1.jpg"
 	}
 	d.AddProduct(prod)
 	d.AddTitleIndex(prod)

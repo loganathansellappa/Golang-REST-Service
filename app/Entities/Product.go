@@ -9,6 +9,7 @@ package Entities
 type Product struct {
 	ID          int     `json:"id,"`
 	Type        string  `json:"type"`
+	ImageUrl    string  `json:"imageUrl"`
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
 	Price       float32 `json:"price"`

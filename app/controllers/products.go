@@ -5,7 +5,6 @@ import (
 	"FruitSale/app/models"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -26,9 +25,6 @@ var (
 
 func HandleProductRequests(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	fmt.Println(request.URL.Path)
-	fmt.Println(request.URL.Path)
-	fmt.Println(request.URL.Path)
 	switch {
 	case request.Method == http.MethodPut && singleProduct.MatchString(request.URL.Path):
 		Update(writer, request)

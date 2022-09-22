@@ -94,18 +94,25 @@ func (d *MemoryDatabase) GetProducts(offset int, limit int) []Entities.Product {
 	d.lock.RLock()
 	defer d.lock.RUnlock()
 
-	// Make a copy of the products map (as a slice)
-	products := make([]Entities.Product, 0, limit)
+	// Its a hack for pagination
+	products := make([]Entities.Product, 0, len(d.products))
 	for _, product := range d.products {
-		if product.ID >= offset && product.ID < offset+limit {
-			products = append(products, product)
-		}
+		products = append(products, product)
 	}
-	// Sort by ID so we return them in a defined order
 	sort.Slice(products, func(i, j int) bool {
 		return products[i].ID < products[j].ID
 	})
-	return products
+
+	if offset >= 0 && offset < len(products) && offset+limit > len(products) {
+		sortedProducts := products[offset:len(products)]
+		return sortedProducts
+	} else if offset >= 0 && offset < len(products) && offset+limit < len(products) {
+		sortedProducts := products[offset : offset+limit]
+		return sortedProducts
+	} else {
+		sortedProducts := []Entities.Product{}
+		return sortedProducts
+	}
 }
 
 /*
@@ -131,7 +138,7 @@ GetProductByID
 func (d *MemoryDatabase) GetProductByID(id int) (Entities.Product, error) {
 	d.lock.RLock()
 	defer d.lock.RUnlock()
-	product, ok := d.products["p"+string(id)]
+	product, ok := d.products[fmt.Sprintf("p%d", id)]
 	if !ok {
 		return Entities.Product{}, ErrDoesNotExist
 	}
@@ -147,10 +154,10 @@ func (d *MemoryDatabase) AddProduct(product Entities.Product) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	if _, ok := d.products["p"+string(product.ID)]; ok {
+	if _, ok := d.products[fmt.Sprintf("p%d", product.ID)]; ok {
 		return ErrAlreadyExists
 	}
-	d.products["p"+string(product.ID)] = product
+	d.products[fmt.Sprintf("p%d", product.ID)] = product
 	return nil
 }
 
@@ -163,10 +170,10 @@ func (d *MemoryDatabase) AddDiscount(discount Entities.Discount) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	if _, ok := d.discounts[string(discount.ID)]; ok {
+	if _, ok := d.discounts[fmt.Sprintf("p%d", discount.ID)]; ok {
 		return ErrAlreadyExists
 	}
-	d.discounts[string(discount.ID)] = discount
+	d.discounts[fmt.Sprintf("p%d", discount.ID)] = discount
 	return nil
 }
 
@@ -203,7 +210,7 @@ UpdateProduct
 	Updates the title of the product
 */
 func (d *MemoryDatabase) UpdateProduct(title string, id int) (*Entities.Product, error) {
-	product, ok := d.products["p"+string(id)]
+	product, ok := d.products[fmt.Sprintf("p%d", id)]
 	if !ok {
 		return nil, ErrDoesNotExist
 	}
@@ -214,7 +221,7 @@ func (d *MemoryDatabase) UpdateProduct(title string, id int) (*Entities.Product,
 		d.RemoveTitleIndex(product.Title)
 		product.Title = title
 		d.AddTitleIndex(product)
-		d.products["p"+string(product.ID)] = product
+		d.products[fmt.Sprintf("p%d", product.ID)] = product
 		return &product, nil
 	}
 	return nil, ErrAlreadyExists
@@ -228,11 +235,12 @@ Seed
 */
 func (d *MemoryDatabase) Seed() {
 	for i := 1; i <= 30; i++ {
-		d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Apple, 1)
+		d.SeedProduct(AUTO_ID.ID()+1, Entities.ProductTypes.Apple, 1)
 		d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Banana, 2)
 		d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Pineapple, 5)
 	}
 	d.SeedDiscount()
+
 }
 func (d *MemoryDatabase) SeedDiscount() {
 	discount := Entities.Discount{
@@ -266,4 +274,10 @@ func (d *MemoryDatabase) SeedProduct(id int, name string, price float32) {
 	}
 	d.AddProduct(prod)
 	d.AddTitleIndex(prod)
+}
+
+func (d *MemoryDatabase) ClearData() {
+	d.products = make(map[string]Entities.Product)
+	d.discounts = make(map[string]Entities.Discount)
+	d.indices = make(map[string]Entities.TitleIndex)
 }

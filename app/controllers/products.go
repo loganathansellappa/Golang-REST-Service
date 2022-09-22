@@ -58,7 +58,9 @@ func ListProducts(w http.ResponseWriter, r *http.Request) {
 	if verifyHeader(w, r) {
 		offset, err1 := strconv.Atoi(r.URL.Query().Get("offset"))
 		if err1 != nil {
-			offset = 1
+			offset = 0
+		} else {
+			offset--
 		}
 		limit, err2 := strconv.Atoi(r.URL.Query().Get("limit"))
 		if err2 != nil {

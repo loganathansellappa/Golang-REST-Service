@@ -1,6 +1,6 @@
 /*
 Model
-	Responsible for handling data
+	Responsible for Business Logic
 */
 
 package models

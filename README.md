@@ -4,6 +4,12 @@
 
 A simple Rest API service Using Golang, which exposes endpoints to List, Show and Update data
 
+
+## API Doc
+
+https://documenter.getpostman.com/view/1756122/2s7ZE8o36G
+
+
 ## Available Features
 
 | Feature                      | URL                                                                                      |
@@ -15,11 +21,6 @@ A simple Rest API service Using Golang, which exposes endpoints to List, Show an
 ## Prerequisite
 
 - [Go] - go1.19.1 darwin/amd64
-
-## API Doc
-
-https://documenter.getpostman.com/view/1756122/2s7ZE8o36G
-
 
 ## Steps to Run tests & start the App
 

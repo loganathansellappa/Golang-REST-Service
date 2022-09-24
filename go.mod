@@ -2,7 +2,10 @@ module FruitSale
 
 go 1.19
 
-require github.com/stretchr/testify v1.8.0
+require (
+	github.com/rs/cors v1.8.2
+	github.com/stretchr/testify v1.8.0
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

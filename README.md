@@ -16,11 +16,23 @@ A simple Rest API service Using Golang, which exposes endpoints to List, Show an
 
 - [Go] - go1.19.1 darwin/amd64
 
+## API Doc
+
+https://documenter.getpostman.com/view/1756122/2s7ZE8o36G
+
+
+## Steps to Run tests & start the App
+
+```sh
+cd Golang-REST-Service
+sh start.sh
+```
+
 ## Steps to Run the App
 
 ```sh
 cd Golang-REST-Service
-go run main.go  
+go run main.go
 ```
 
 ## Steps to Run Unit test App
@@ -29,10 +41,6 @@ go run main.go
 cd Golang-REST-Service/app/tests
 go test
 ```
-
-## API Doc
-
-https://documenter.getpostman.com/view/1756122/2s7ZE8o36G
 
 ## Sample Requests:
 

@@ -3,6 +3,7 @@ package main
 import (
 	"FruitSale/app/config"
 	"FruitSale/app/db"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 )
@@ -14,7 +15,9 @@ main
 */
 
 func main() {
-	log.Print("Listening...")
+	log.Println("Loading Seed data....")
 	db.DB.Seed()
-	http.ListenAndServe(":3000", config.InitRoutes())
+	handler := cors.AllowAll().Handler(config.InitRoutes())
+	log.Println("App Started.....")
+	http.ListenAndServe(":3000", handler)
 }

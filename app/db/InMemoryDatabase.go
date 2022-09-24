@@ -120,7 +120,7 @@ func (d *MemoryDatabase) GetProducts(offset int, limit int) []Entities.Product {
 /*
 GetProductLists
 
-	Formatted response for list requset
+	Formatted response for list request
 */
 func (d *MemoryDatabase) GetProductLists(offset int, limit int) (*Entities.ProductList, error) {
 	d.lock.RLock()
@@ -143,6 +143,11 @@ func (d *MemoryDatabase) GetProductByID(id int) (Entities.Product, error) {
 	product, ok := d.products[fmt.Sprintf("p%d", id)]
 	if !ok {
 		return Entities.Product{}, ErrDoesNotExist
+	} else {
+		discount, _ := d.discounts[product.Type]
+		if discount.Valid == true {
+			product.Discount = &discount
+		}
 	}
 	return product, nil
 }
@@ -172,10 +177,10 @@ func (d *MemoryDatabase) AddDiscount(discount Entities.Discount) error {
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
-	if _, ok := d.discounts[fmt.Sprintf("p%d", discount.ID)]; ok {
+	if _, ok := d.discounts[discount.ProductType]; ok {
 		return ErrAlreadyExists
 	}
-	d.discounts[fmt.Sprintf("p%d", discount.ID)] = discount
+	d.discounts[discount.ProductType] = discount
 	return nil
 }
 
@@ -236,16 +241,15 @@ Seed
 	Seed dummy data foe the app
 */
 func (d *MemoryDatabase) Seed() {
+	d.SeedProduct(AUTO_ID.ID()+1, Entities.ProductTypes.Banana, 2)
 	d.SeedProduct(AUTO_ID.ID()+1, Entities.ProductTypes.Apple, 1)
-	d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Banana, 2)
-	d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Pineapple, 5)
-	d.SeedDiscount()
-	for i := 1; i <= 30; i++ {
+	d.SeedProduct(AUTO_ID.ID()+1, Entities.ProductTypes.Pineapple, 5)
+	for i := 1; i <= 50; i++ {
 		rand.Seed(time.Now().UnixNano())
 		price := float32(rand.Intn(30-1) + 1)
 		d.SeedProduct(AUTO_ID.ID(), Entities.ProductTypes.Others, price)
 	}
-
+	d.SeedDiscount()
 }
 func (d *MemoryDatabase) SeedDiscount() {
 	discount := Entities.Discount{
@@ -264,7 +268,7 @@ func (d *MemoryDatabase) SeedDiscount() {
 		Type:        Entities.DiscountTypes.Price,
 		ProductType: Entities.ProductTypes.Pineapple,
 		Value:       2,
-		Reward:      1,
+		Reward:      3,
 	}
 	d.AddDiscount(discountTwo)
 }
